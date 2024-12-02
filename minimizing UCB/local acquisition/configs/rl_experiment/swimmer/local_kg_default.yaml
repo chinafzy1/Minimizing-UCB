@@ -1,0 +1,76 @@
+method: local_kg
+
+out_dir: './experiments/rl_experiments/swimmer/local_kg'  # Directory for experiment results.
+
+environment_name: Swimmer-v1
+mlp:
+    layers: [8,2]
+    discretize:
+    add_bias: False
+    state_normalization: False
+    manipulate_reward:
+        shift:
+        scale: 350
+
+trials: 5
+# Either choose max_iterations or max_objective_calls unequal None.
+max_iterations: 70
+max_objective_calls: 
+
+optimizer_config:
+    Model: derivative_gp
+    model_config:
+        prior_mean: 0.
+        ard_num_dims: dim_search_space  # If not None, each input dimension gets its own separate lengthscale.
+        N_max: 64
+        lengthscale_constraint:
+            constraint:
+            kwargs:
+        lengthscale_hyperprior:
+            prior: gamma
+            kwargs:
+                concentration: 1.5
+                rate: 10
+        outputscale_constraint:
+            constraint: greather_than
+            kwargs:
+                lower_bound: -0.001
+        outputscale_hyperprior:
+            prior: normal
+            kwargs:
+                loc: 2.
+                scale: 1.
+        noise_constraint:
+            constraint:
+            kwargs:
+        noise_hyperprior:
+            prior:
+            kwargs:
+    hyperparameter_config:
+        optimize_hyperparameters: True
+        hypers:
+            covar_module.base_kernel.lengthscale:
+            covar_module.outputscale:
+            likelihood.noise: .01
+        no_noise_optimization: True
+    acqf_config: 
+        num_fantasies: 256
+    delta: 0.25
+    optimize_acqf: opt_kg
+    optimize_acqf_config: 
+        q: 4
+        num_restarts: 5
+        raw_samples: 64
+    bounds: 
+        lower_bound: 
+        upper_bound: 
+    explore_interval: 1
+    optimize_inner_acqf_config:
+        q: 1
+        num_restarts: 64
+        raw_samples: 256
+        bounds: 
+            lower_bound: -10.0
+            upper_bound: 10.0
+    generate_initial_data:
+    verbose: False

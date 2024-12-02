@@ -1,0 +1,75 @@
+method: local_kg
+
+wandb_config:
+    project_name: zoofoo-rover
+    entity: quanwustl
+    name: lkg-iter-delta_1e-2-iso-prior-b=1-N=32
+
+out_dir: './experiments/rl_experiments/test_experiment/gibo/'  # Directory for experiment results.
+
+trials: 1
+seed: 10
+# Either choose max_iterations or max_objective_calls unequal None.
+max_iterations:
+max_objective_calls: 1000
+
+optimizer_config:
+    Model: derivative_gp
+    model_config:
+        prior_mean: 0.
+        ard_num_dims:  # If not None, each input dimension gets its own separate lengthscale.
+        N_max: 32
+        lengthscale_constraint:
+            constraint: interval
+            kwargs:
+                lower_bound: 0.0001
+                upper_bound: 10.0
+        lengthscale_hyperprior:
+            prior: normal
+            kwargs:
+                loc: 9.0
+                scale: 1.0
+        outputscale_constraint:
+            constraint: interval
+            kwargs:
+                lower_bound: 0.0001
+                upper_bound: 1000.0
+        outputscale_hyperprior:
+            prior: normal
+            kwargs:
+                loc: 5.0
+                scale: 1.0
+        noise_constraint:
+            constraint:
+            kwargs:
+        noise_hyperprior:
+            prior:
+            kwargs:
+    hyperparameter_config:
+        optimize_hyperparameters: True
+        hypers:
+            covar_module.base_kernel.lengthscale:
+            covar_module.outputscale:
+            likelihood.noise: .01
+        no_noise_optimization: True
+    acqf_config: 
+        num_fantasies: 256
+    delta: 1
+    optimize_acqf: opt_kg
+    optimize_acqf_config: 
+        q: 1
+        num_restarts: 5
+        raw_samples: 64
+    bounds: 
+        lower_bound: -25.0
+        upper_bound: 25.0
+    explore_interval: 10
+    optimize_inner_acqf_config:
+        q: 1
+        num_restarts: 15
+        raw_samples: 256
+        bounds: 
+            lower_bound: -25.0
+            upper_bound: 25.0
+    generate_initial_data:
+    verbose: False

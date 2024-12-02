@@ -1,0 +1,63 @@
+method: local_kg  # Local knowledge gradient.
+
+out_dir: './experiments/synthetic_experiments/test_experiment/local_kg/'
+
+# Either choose max_iterations or max_objective_calls not None.
+max_iterations: 
+max_objective_calls: 100 #300
+
+# Manually set hyperparameters.
+set_hypers: True  
+only_set_noise_hyper: False 
+
+optimizer_config: 
+    Model: derivative_gp
+    model_config:
+        prior_mean: 0
+        ard_num_dims: dim_search_space  # If 'dim_search_space', each input dimension gets its own separate lengthscale.  
+        lengthscale_constraint: 
+            constraint:
+            kwargs:
+        lengthscale_hyperprior: 
+            prior: 
+            kwargs: 
+        outputscale_constraint:
+            constraint: 
+            kwargs: 
+        outputscale_hyperprior:
+            prior: 
+            kwargs:
+        noise_constraint: 
+            constraint:
+            kwargs:
+        noise_hyperprior:
+            prior:
+            kwargs:
+    hyperparameter_config: 
+        optimize_hyperparameters: False
+        hypers:
+            covar_module.base_kernel.lengthscale:
+            covar_module.outputscale:
+            likelihood.noise:
+        no_noise_optimization: False
+    acqf_config: 
+        num_fantasies: 256
+    delta: 0.2
+    explore_interval: 1
+    optimize_acqf: opt_kg
+    optimize_acqf_config: 
+        q: dim_search_space
+        num_restarts: 5
+        raw_samples: 64
+    bounds: 
+        lower_bound: 0.0
+        upper_bound: 1.0
+    optimize_inner_acqf_config:
+        q: 1
+        num_restarts: 15
+        raw_samples: 256
+        bounds: 
+            lower_bound: 0.0
+            upper_bound: 1.0
+    generate_initial_data:
+    verbose: False
