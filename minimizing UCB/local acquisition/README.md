@@ -37,7 +37,7 @@ python generate_data_synthetic_functions.py -c ./configs/synthetic_experiment/ge
 Afterwards you can run for instance our method MPD on these test functions.
 
 ```
-python run_synthetic_experiment.py -c ./configs/synthetic_experiment/minUCB_default.yaml -cd ./configs/synthetic_experiment/generate_data_default.yaml
+python run_synthetic_experiment.py -c ./configs/synthetic_experiment/LAminUCB_default.yaml -cd ./configs/synthetic_experiment/generate_data_default.yaml
 ```
 
 ### Reinforcement Learning
@@ -45,7 +45,7 @@ python run_synthetic_experiment.py -c ./configs/synthetic_experiment/minUCB_defa
 Run the MuJoCo swimmer environment with the proposed method MPD.
 
 ```
-python run_rl_experiment.py -c ./configs/rl_experiment/swimmer/minUCB.yaml
+python run_rl_experiment.py -c ./configs/rl_experiment/swimmer/LAminUCB.yaml
 ```
 
 ### Custom Objective Functions
@@ -53,5 +53,5 @@ python run_rl_experiment.py -c ./configs/rl_experiment/swimmer/minUCB.yaml
 Run the Rover trajectory planning function with the proposed method MPD.
 
 ```
-python run_custom_experiment.py -c ./configs/custom_experiment/MinUCB_default.yaml
+python run_custom_experiment.py -c ./configs/custom_experiment/LAMinUCB_default.yaml
 ```
