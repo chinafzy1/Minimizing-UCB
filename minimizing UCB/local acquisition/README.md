@@ -1,7 +1,7 @@
 # Minimizing UCB: a Better Local Search Strategy in Local Bayesian Optimization
 
 This repository contains code for the paper [Minimizing UCB: a Better Local Search Strategy in Local Bayesian Optimization](https://openreview.net/forum?id=5GCgNFZSyo&referrer=%5Bthe%20profile%20of%20Zheyi%20Fan%5D(%2Fprofile%3Fid%3D~Zheyi_Fan2)).
-Our code implementation extends the [GIBO](https://arxiv.org/abs/2106.11899)'s and the [MPD](https://proceedings.neurips.cc/paper_files/paper/2022/hash/555479a201da27c97aaeed842d16ca49-Abstract-Conference.html) codebase, and more detail can be found in [their repository](https://github.com/sarmueller/gibo), (https://github.com/kayween/local-bo-mpd).
+Our code implementation extends the [GIBO](https://arxiv.org/abs/2106.11899)'s and the [MPD](https://proceedings.neurips.cc/paper_files/paper/2022/hash/555479a201da27c97aaeed842d16ca49-Abstract-Conference.html) codebase, and more detail can be found in [https://github.com/sarmueller/gibo](https://github.com/sarmueller/gibo), [https://github.com/kayween/local-bo-mpd](https://github.com/kayween/local-bo-mpd).
 
 Please consider citing our paper:
 ```
@@ -37,7 +37,7 @@ python generate_data_synthetic_functions.py -c ./configs/synthetic_experiment/ge
 Afterwards you can run for instance our method MPD on these test functions.
 
 ```
-python run_synthetic_experiment.py -c ./configs/synthetic_experiment/MinUCB_default.yaml -cd ./configs/synthetic_experiment/generate_data_default.yaml
+python run_synthetic_experiment.py -c ./configs/synthetic_experiment/minUCB_default.yaml -cd ./configs/synthetic_experiment/generate_data_default.yaml
 ```
 
 ### Reinforcement Learning
@@ -45,7 +45,7 @@ python run_synthetic_experiment.py -c ./configs/synthetic_experiment/MinUCB_defa
 Run the MuJoCo swimmer environment with the proposed method MPD.
 
 ```
-python run_rl_experiment.py -c ./configs/rl_experiment/MinUCB_default.yaml
+python run_rl_experiment.py -c ./configs/rl_experiment/swimmer/minUCB.yaml
 ```
 
 ### Custom Objective Functions

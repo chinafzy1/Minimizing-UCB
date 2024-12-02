@@ -13,7 +13,7 @@ from src.optimizers import (
     MPDOptimizer,
     FiniteDiffGradientAscentOptimizer,
     FiniteDiffGradientAscentOptimizerv2,
-    LocalKnowledgeGradient,
+    LAMinUCB,
     MinimizingUCB,
     TURBO,
 )
@@ -54,7 +54,7 @@ insertion_config = {
         "mpd": MPDOptimizer,
         "fd": FiniteDiffGradientAscentOptimizer,
         "fd2": FiniteDiffGradientAscentOptimizerv2,
-        "local_kg": LocalKnowledgeGradient,
+        "local_kg": LAMinUCB,
         "kg": qKnowledgeGradient,
         "MinUCB": MinimizingUCB,
         "turbo": TURBO,

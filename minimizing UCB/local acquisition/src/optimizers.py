@@ -1826,7 +1826,7 @@ class MinimizingUCB(AbstractOptimizer):
 
 
 
-class LocalKnowledgeGradient(AbstractOptimizer):
+class LAMinUCB(AbstractOptimizer):
 
 
     """Optimizer class for vanilla Bayesian optimization.
@@ -1874,7 +1874,7 @@ class LocalKnowledgeGradient(AbstractOptimizer):
         
     ):
         """Inits the vanilla BO optimizer."""
-        super(LocalKnowledgeGradient, self).__init__(params_init, objective)
+        super(LAMinUCB, self).__init__(params_init, objective)
 
         # Parameter initialization.
         self.params_history_list = [self.params.clone()]
