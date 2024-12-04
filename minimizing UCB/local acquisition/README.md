@@ -5,7 +5,7 @@ Our code implementation extends the [GIBO](https://arxiv.org/abs/2106.11899)'s a
 
 Please consider citing our paper:
 ```
-@inproceedings{nguyen2022local,
+@inproceedings{fan2024minimizing,
     title = {{Minimizing UCB: a Better Local Search Strategy in Local Bayesian Optimization}},
     author = {Fan, Zheyi and Wang, Wenyu and Ng, Szu Hui and Hu, Qingpei},
     booktitle = {Advances in Neural Information Processing Systems},
