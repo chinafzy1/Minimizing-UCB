@@ -16,7 +16,6 @@ from src.acquisition_function import GradientInformation, DownhillQuadratic
 from src.local_KG import Local_KG, Local_acquisition,Local_acquisition_1
 from src.model import ExactGPSEModel, DerivativeExactGPSEModel
 # from src.local_KG import Local_KG, Local_Acquisition
-from tempt import max_y_value
 from botorch.optim import optimize_acqf
 from botorch.acquisition import qKnowledgeGradient
 
@@ -1555,7 +1554,7 @@ class MinimizingUCB(AbstractOptimizer):
         wandb_run=None,
     ) -> None:
         """Inits optimizer Bayesian gradient ascent."""
-        super(MinimizingUCB, self).__init__(params_init, objective)
+        super().__init__(params_init, objective)
 
         self.normalize_gradient = normalize_gradient
         self.standard_deviation_scaling = standard_deviation_scaling
@@ -1669,18 +1668,34 @@ class MinimizingUCB(AbstractOptimizer):
 
         self.wandb_run.log(log_dict)
 
-    def inspect_acq_func(self, num_samples=1_000_000):
-        with torch.no_grad():
-            sobol_eng = torch.quasirandom.SobolEngine(dimension=self.params.size(-1))
-            samples = sobol_eng.draw(num_samples)
-            samples = samples.unsqueeze(1)  # batch_shape x q=1 x d
-            samples = (
-                2 * self.delta * samples - self.delta
-            )  # map to the cube around self.params
+    def inspect_acq_func(self, num_samples=1_000_000, bound_multiplier=1):
+        # with torch.no_grad():
+        #     sobol_eng = torch.quasirandom.SobolEngine(dimension=self.params.size(-1))
+        #     samples = sobol_eng.draw(num_samples)
+        #     samples = 2 * self.delta * samples - self.delta  # map to the cube around self.params
+        #
+        #     acq_values = []
+        #     for sample in samples:
+        #         sample = sample.unsqueeze(0)
+        #         acq_values.append(self.acquisition_fcn(sample))
+        #
+        #     acq_values = torch.cat(acq_values, dim=0)
+        #
+        # return acq_values.max()
 
-            acq_values = self.acquisition_fcn(samples)
+        _, acq_value = botorch.optim.optimize_acqf(
+            self.acquisition_fcn,
+            bound_multiplier * torch.tensor([[-self.delta], [self.delta]])
+            + self.params,
+            q=1,
+            num_restarts=5,
+            raw_samples=num_samples,
+            options={"nonnegative": True, "batch_limit": 5},
+            return_best_only=True,
+            sequential=False,
+        )
 
-        return acq_values.max()
+        return acq_value
 
     def step(self) -> None:
         # Sample with new params from objective and add this to train data.
@@ -1727,9 +1742,11 @@ class MinimizingUCB(AbstractOptimizer):
                 self.model.likelihood, self.model
             )
             botorch.fit.fit_gpytorch_model(mll)
-            self.model.posterior(
-                self.params
-            )  # Call this to update prediction strategy of GPyTorch.
+            # self.model = train_model(self.model)
+            with gpytorch.settings.cholesky_jitter(1e-1):
+                self.model.posterior(
+                    self.params
+                )  # Call this to update prediction strategy of GPyTorch.
 
         self.acquisition_fcn.update_theta_i(self.params)
 
@@ -1740,11 +1757,14 @@ class MinimizingUCB(AbstractOptimizer):
             new_y = self.objective(new_x)
             self.alpha_star = acq_value.item()
             # self.sampled_alpha_star = self.inspect_acq_func()
+            self.model.append_train_data(new_x, new_y)
+
+
             if self.wandb_run is not None:
                 self.log_stats(log_rewards=False)
 
             # Update training points.
-            self.model.append_train_data(new_x, new_y)
+
 
             if (
                 type(self.objective._func) is EnvironmentObjective
@@ -1758,16 +1778,16 @@ class MinimizingUCB(AbstractOptimizer):
 
             # Stop sampling if differece of values of acquired points is smaller than a threshold.
             # Equivalent to: variance of gradient did not change larger than a threshold.
-            if self.epsilon_diff_acq_value is not None:
-                if acq_value_old is not None:
-                    diff = acq_value - acq_value_old
-                    if diff < self.epsilon_diff_acq_value:
-                        if self.verbose:
-                            print(
-                                f"Stop sampling after {i+1} samples, since gradient certainty is {diff}."
-                            )
-                        break
-                acq_value_old = acq_value
+            # if self.epsilon_diff_acq_value is not None:
+            #     if acq_value_old is not None:
+            #         diff = acq_value - acq_value_old
+            #         if diff < self.epsilon_diff_acq_value:
+            #             if self.verbose:
+            #                 print(
+            #                     f"Stop sampling after {i+1} samples, since gradient certainty is {diff}."
+            #                 )
+            #             break
+            #     acq_value_old = acq_value
 
         self.move(method="step")
 
@@ -1794,28 +1814,15 @@ class MinimizingUCB(AbstractOptimizer):
 
     def move(self, method):
         if method == "step":
-            
+            initial_point=self.params.unsqueeze(0)            
             acq_local=Local_acquisition_1(model=self.model)
             best_x,_=optimize_acqf(
             acq_local,
+            batch_initial_conditions=initial_point.detach(),
             **self.optimize_inner_acqf_config
             )
             self.params.data = best_x.detach()
             print("current best value = ",self.objective(self.params.data))
-        elif method == "mu":
-            tmp_params, maximized_mean = botorch.optim.optimize_acqf(
-                acq_function=botorch.acquisition.analytic.PosteriorMean(
-                    model=self.model
-                ),
-                bounds=torch.tensor([[-10], [10]]) + self.params.detach(),
-                q=1,
-                num_restarts=1,
-                raw_samples=1,
-                batch_initial_conditions=self.params.detach(),
-            )
-            tmp_params = tmp_params.unsqueeze(0)
-
-            self.params.data = tmp_params
 
         else:
             raise ValueError("invalid move method")
@@ -2018,7 +2025,7 @@ class LAMinUCB(AbstractOptimizer):
             tempt = self.objective(best_x_r.clone())
             if tempt>self.params_value:
                 self.params = best_x.clone()
-                self.params_value=self.objective(self.params.unsqueeze(0))
+                self.params_value=tempt
             self.params_history_list.append((self.params).unsqueeze(0))
             train_x = torch.cat([self.model.train_inputs[0], best_x_r.clone()])
             train_y = torch.cat([self.model.train_targets, tempt])
@@ -2034,7 +2041,10 @@ class LAMinUCB(AbstractOptimizer):
 
             self.update_bounds=True
             if self.verbose:
-                posterior = self.model.posterior(self.params)
+                posterior = self.model.posterior((self.params).unsqueeze(0))
+                # print(
+                #     f"Parameter {self.params.numpy()} with mean {posterior.mvn.mean.item(): .2f} and variance {posterior.mvn.variance.item(): .2f} of the posterior of the GP model."
+                # )
                 print(
                     f"Parameter {self.params.numpy()} with mean {posterior.mvn.mean.item(): .2f} and variance {posterior.mvn.variance.item(): .2f} of the posterior of the GP model."
                 )

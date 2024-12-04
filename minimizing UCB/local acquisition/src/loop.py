@@ -8,7 +8,7 @@ from src.optimizers import (
     VanillaBayesianOptimization,
     BayesianGradientAscent,
     MPDOptimizer,
-    LocalKnowledgeGradient,
+    LAMinUCB,
 )
 
 
@@ -37,7 +37,7 @@ def loop(
     max_iterations: Optional[int],
     max_objective_calls: Optional[int],
     objective: Union[Callable[[torch.Tensor], torch.Tensor], EnvironmentObjective],
-    Optimizer: Union[BayesianGradientAscent, VanillaBayesianOptimization, MPDOptimizer,LocalKnowledgeGradient],
+    Optimizer: Union[BayesianGradientAscent, VanillaBayesianOptimization, MPDOptimizer,LAMinUCB],
     optimizer_config: Optional[Dict],
     verbose=True,
     wandb_run=None,

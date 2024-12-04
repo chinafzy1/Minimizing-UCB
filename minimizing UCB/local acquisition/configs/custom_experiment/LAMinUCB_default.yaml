@@ -5,7 +5,7 @@ wandb_config:
     entity: quanwustl
     name: lkg-iter-delta_1e-2-iso-prior-b=1-N=32
 
-out_dir: './experiments/rl_experiments/test_experiment/gibo/'  # Directory for experiment results.
+out_dir: './experiments/rl_experiments/test_experiment/LA-MinUCB/'  # Directory for experiment results.
 
 trials: 1
 seed: 10
@@ -63,7 +63,7 @@ optimizer_config:
     bounds: 
         lower_bound: -25.0
         upper_bound: 25.0
-    explore_interval: 10
+    explore_interval: 5
     optimize_inner_acqf_config:
         q: 1
         num_restarts: 15
@@ -72,4 +72,4 @@ optimizer_config:
             lower_bound: -25.0
             upper_bound: 25.0
     generate_initial_data:
-    verbose: False
+    verbose: True

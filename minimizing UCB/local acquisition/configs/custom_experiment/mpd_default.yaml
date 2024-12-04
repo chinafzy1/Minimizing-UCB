@@ -5,7 +5,7 @@ wandb_config:
     entity: quanwustl
     name: mpd-iter-delta_1e-2-iso-prior-b=1-N=32
 
-out_dir: './experiments/rl_experiments/test_experiment/gibo/'  # Directory for experiment results.
+out_dir: './experiments/rl_experiments/test_experiment/MPD/'  # Directory for experiment results.
 
 trials: 1
 seed: 10

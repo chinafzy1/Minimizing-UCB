@@ -47,14 +47,14 @@ optimizer_config:
     optimize_acqf: opt_kg
     optimize_acqf_config: 
         q: dim_search_space
-        num_restarts: 5
-        raw_samples: 64
+        num_restarts: 16
+        raw_samples: 512
     bounds: 
         lower_bound: 0.0
         upper_bound: 1.0
     optimize_inner_acqf_config:
         q: 1
-        num_restarts: 15
+        num_restarts: 32
         raw_samples: 256
         bounds: 
             lower_bound: 0.0
