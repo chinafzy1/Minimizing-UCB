@@ -34,8 +34,8 @@ optimizer_config:
         lengthscale_hyperprior:
             prior: gamma
             kwargs:
-                concentration: 1.5
-                rate: 10
+                concentration: 2.5
+                rate: 1
         outputscale_constraint:
             constraint: greather_than
             kwargs:
