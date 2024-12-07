@@ -29,7 +29,7 @@ optimizer_config:
         lengthscale_hyperprior:
             prior: gamma
             kwargs:
-                concentration: 1.5
+                concentration: 2.5
                 rate: 10
         outputscale_constraint:
             constraint: greather_than
@@ -55,7 +55,7 @@ optimizer_config:
         no_noise_optimization: True
     acqf_config: 
         num_fantasies: 256
-    delta: 0.25
+    delta: 0.15
     optimize_acqf: opt_kg
     optimize_acqf_config: 
         q: 4
